@@ -16,6 +16,8 @@ type DataBackendOptions struct {
 	Repository           string
 	Tag                  string
 	EnvironmentVariables []string
+	Cmd					 string
+
 	RelevantPort         string
 }
 

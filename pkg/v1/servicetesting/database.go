@@ -3,8 +3,23 @@ package servicetesting
 import (
 	"fmt"
 	"github.com/ory/dockertest"
+	"strings"
 	"time"
 )
+
+func convertOptsToRunOptions(opts *DataBackendOptions) (result *dockertest.RunOptions) {
+	result = &dockertest.RunOptions{
+		Repository: opts.Repository,
+		Tag:        opts.Tag,
+		Env: 		opts.EnvironmentVariables,
+	}
+
+	if opts.Cmd != "" {
+		result.Cmd = strings.Split(opts.Cmd, " ")
+	}
+	
+	return result
+}
 
 func createDataBackend(opts *DataBackendOptions) (result *DatabaseBackend, err error) {
 	result = &DatabaseBackend{}
@@ -14,7 +29,7 @@ func createDataBackend(opts *DataBackendOptions) (result *DatabaseBackend, err e
 		return nil, fmt.Errorf("error connecting to docker pool: %w", err)
 	}
 
-	result.dockerResource, err = result.dockerPool.Run(opts.Repository, opts.Tag, opts.EnvironmentVariables)
+	result.dockerResource, err = result.dockerPool.RunWithOptions(convertOptsToRunOptions(opts))
 	if err != nil {
 		return nil, fmt.Errorf("error creating docker resource: %w", err)
 	}
